@@ -6,4 +6,7 @@ word2pdf
 find_duplicate_words
   find duplicate words in a text
 
+wiki
+  start vim with local wiki
+
 

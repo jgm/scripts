@@ -1,0 +1,3 @@
+#!/bin/sh
+DESTINATION=${1:-WelcomePage}
+vim -X /home/jgm/Wiki/$DESTINATION
