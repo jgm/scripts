@@ -1,0 +1,15 @@
+#!/bin/sh
+NOTEFILE=$HOME/Wiki/UnfiledNotes
+case $1 in
+  -e)
+    vim -X $NOTEFILE
+    ;;
+  -l)
+    cat $NOTEFILE
+    ;;
+   *)
+    echo >> $NOTEFILE
+    date >> $NOTEFILE
+    cat >> $NOTEFILE
+    ;;
+esac

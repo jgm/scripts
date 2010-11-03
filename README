@@ -6,6 +6,9 @@ find_duplicate_words
 googlecode_upload.py
   upload to googlecode downloads
 
+note
+  add a note to a list of unstructured notes
+
 texdiff.pl
   diff for TeX files
 
