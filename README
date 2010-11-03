@@ -3,8 +3,14 @@ A collection of small scripts that serve various purposes.
 find_duplicate_words
   find duplicate words in a text
 
+todo
+  starts vim with todo list
+
 tunnel
   wrapper for setting up an ssh tunnel
+
+typeOf
+  uses ghci to determine type of Haskell expression
 
 wiki
   start vim with local wiki
