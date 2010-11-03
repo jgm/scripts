@@ -3,6 +3,9 @@ A collection of small scripts that serve various purposes.
 find_duplicate_words
   find duplicate words in a text
 
+googlecode_upload.py
+  upload to googlecode downloads
+
 texdiff.pl
   diff for TeX files
 
