@@ -1,0 +1,78 @@
+#!/bin/sh
+# Use duplicity to backup to s3
+
+export AWS_ACCESS_KEY_ID=$(cat $HOME/Private/aws-access-key-id)
+export AWS_SECRET_ACCESS_KEY=$(cat $HOME/Private/aws-secret-access-key)
+export PASSPHRASE=$(cat $HOME/Private/gpg-passphrase)
+
+DUPLICITY=/usr/bin/duplicity
+BUCKET=john-macfarlane-protagoras
+BUCKET_PATH=backups/home/jgm
+URL=s3+http://$BUCKET/${BUCKET_PATH}
+GPG_KEY=E24A2ECB
+PRUNE_TIME=30D
+FULL_TIME=30D
+VOLUME_SIZE=50
+EXCLUDES=$HOME/.backup-excludes
+SOURCEDIR=$HOME
+type=
+status=0
+type=
+
+if [ $# -ge 1 ]; then
+   type=$1
+   shift
+fi
+
+usage() {
+  PROG=${0##*/}
+  echo >&2 "$PROG:  Backs up $SOURCEDIR to $URL."
+  echo >&2 "Usage:"
+  echo >&2 "  $PROG [opts]            incremental backup if possible, otherwise full"
+  echo >&2 "  $PROG list-files [opts] list backed up files"
+  echo >&2 "  $PROG status [opts]     list all backup sets"
+  echo >&2 "  $PROG cleanup [opts]    cleanup after a failed backup"
+  echo >&2 "  $PROG restore [PATH1] [--file-to-restore PATH2] [-t TIME] [opts]"
+  echo >&2 "     restore PATH2 (or $SOURCEDIR) as of TIME to PATH1 (or $SOURCEDIR)"
+  echo >&2 "Options:  [opts] may include any duplicity options, for example:"
+  echo >&2 "  -v5                     verbose output"
+  echo >&2 "  --volsize NUM           set volume size in Mb"
+  echo >&2 "See duplicity(1) man page for details."
+  exit 0
+}
+
+case "$type" in
+  restore)        $DUPLICITY restore \
+                  --encrypt-key ${GPG_KEY} \
+                  "$URL" "$@"
+                  break ;;
+  list-files)     dir=$2
+                  $DUPLICITY list-current-files  \
+                  --encrypt-key ${GPG_KEY} \
+                  "$URL/$dir" "$@"
+                  break ;;
+  incr)
+                  $DUPLICITY \
+                  --exclude-globbing-filelist $EXCLUDES \
+                  --encrypt-key ${GPG_KEY} \
+                  --volsize ${VOLUME_SIZE} \
+                  --full-if-older-than ${FULL_TIME} \
+                  $SOURCEDIR $URL "$@" && \
+                  $DUPLICITY remove-older-than ${PRUNE_TIME} --force $URL
+                  break ;;
+  status)         $DUPLICITY collection-status $URL "$@"
+                  break;;
+  cleanup)        $DUPLICITY cleanup $URL "$@"
+                  break;;
+  -h|--help)      usage
+                  break;;
+  *)              echo >&2 "Unknown command: $type"
+                  status=1
+                  break ;;
+esac
+
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
+export PASSPHRASE=
+
+exit $status

@@ -1,5 +1,8 @@
 A collection of small scripts that serve various purposes.
 
+backup
+  remote backup script, wrapping duplicity
+
 calnet
   lookup names in Calnet LDAP directory
 
