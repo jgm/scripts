@@ -3,6 +3,9 @@ A collection of small scripts that serve various purposes.
 find_duplicate_words
   find duplicate words in a text
 
+texdiff.pl
+  diff for TeX files
+
 todo
   starts vim with todo list
 
