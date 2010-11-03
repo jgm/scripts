@@ -1,0 +1,10 @@
+#!/bin/sh
+# script finds the type of a Haskell expression
+# argument is file containing the expression
+# the expression itself goes to stdin
+
+FILE=$*
+DECL=`cat`
+ID=`echo $DECL | sed 's/^\([^ ]*\).*/\1/'`
+echo ":t $ID" | ghci -v0 -cpp -fglasgow-exts -w $FILE
+echo $DECL
