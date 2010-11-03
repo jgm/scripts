@@ -9,6 +9,9 @@ tunnel
 wiki
   start vim with local wiki
 
+wman
+  fetch man pages for different OSs
+
 word2pdf
   convert Word files to PDF from the command line, using OpenOffice
 
