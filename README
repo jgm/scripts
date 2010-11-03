@@ -1,5 +1,8 @@
 A collection of small scripts that serve various purposes.
 
+calnet
+  lookup names in Calnet LDAP directory
+
 find_duplicate_words
   find duplicate words in a text
 

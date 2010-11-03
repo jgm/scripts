@@ -1,0 +1,224 @@
+#!/usr/bin/perl
+# usage:  calnet NAME
+# searches for (last) NAME in calnet directory
+#
+#
+# Search the CalNet Directory Service using a 'uid' attribute
+# and return selected attributes of the UC Berkeley-affiliated
+# person, if any, that matches that 'uid'
+#
+# Prerequisite: Graham Barr's Perl-LDAP, whose home page is located at:
+#
+#   http://perl-ldap.sourceforge.net/
+#
+# For additional Perl-LDAP documentation and usage examples, see:
+#
+#   http://www.perlmonth.com/features/ldap/ldap.html?issue=11
+#   http://theoryx5.uwinnipeg.ca/CPAN/data/perl-ldap/Net/LDAP/Examples.html
+#
+# Some significant limitations of the code sample below include:
+#
+# - It is a simple, procedural script.  You'd likely want to break out
+#   several of its functions into individual subroutines.
+#
+# - It performs only primitive error handling.  (It just dies and displays
+#   an error message when an error occurs.)
+#
+# - It doesn't automatically try any alternate directory servers
+#   if the primary server is unavailable.
+#
+# - It performs an "anonymous" bind to the directory.
+#
+#   In some cases, your application might need to bind (authenticate)
+#   to the CalNet directory as a specific user, rather than anonymously.
+#   You'd need to do so, for instance, to access non-public attributes of
+#   campus people, such as their CalNet IDs or student IDs.
+#
+#   (Note: to access such non public-attributes, you'll first need to
+#   obtain the appropriate permissions from the CalNet System's
+#   administrators and often also from the campus department[s] which
+#   own that data.)
+#
+#   Here is an example of how you would bind to the directory as a specific
+#   user, from Mark Wilcox's article on www.pearlmonth.com (above):
+#
+#   my $mesg = $ldap->bind('uid=myuid,ou=people,dc=berkeley,dc=edu',
+#                          password => 'password');
+#
+#   In addition, when binding as a specific user, your application's
+#   connection to the directory should be made using SSL.  This way,
+#   your directory user password and the non-public data you are
+#   receiving will be encrypted when being sent over the network.
+#
+#   For more information about how to use Perl-LDAP to connect to the
+#   directory using SSL encryption, see the documentation for the
+#   Net::LDAPS module, which is included with the Perl-LDAP distribution:
+#
+#     http://perl-ldap.sourceforge.net/doc/Net/LDAPS.html
+#
+#   The additional prerequisites for using Perl-LDAP with SSL appear to be:
+#
+#         OpenSSL:  http://www.openssl.org/
+#     Net::SSLeay:  http://www.bacus.pt/Net_SSLeay/index.html
+
+use Net::LDAPS;
+
+# ---------------------------------------------------------------
+
+# Accept a single command line parameter, the 'uid' attribute that
+# uniquely identifies 'people' entries in the CalNet Directory Service
+#$uid = $ARGV[0] || 3877;
+
+# Convenience placeholder if we want to repeatedly test with a specific uid
+# $uid = "3877"; // Replace this uid with the one you would like to test
+
+$name = $ARGV[0];
+#$uid = '172095';
+
+# Define variables
+# ----------------
+# LDAP directory to contact
+$directoryURL     = "caldir.berkeley.edu";
+#$directoryURL     = "manzanita.berkeley.edu";
+# $directoryURL       = "pongo.berkeley.edu"; // alternate server
+
+$LDAPBIND = 'uid=YourAppBind,ou=Directory Administrators,dc=berkeley,dc=edu';
+$LDAPPWD  = 'YourAppPassword';
+  
+
+# Portion of the directory we'll be searching
+$searchBase         = "ou=people,dc=berkeley,dc=edu";
+
+# The attributes (and their associated values) that we wish to
+# search for in the directory.
+#
+# In this instance, we're searching for the directory entry
+# which matches a specific 'uid'.
+#
+# If we were searching for entries by name, for instance,
+# we could instead search on the common name (cn) attribute,
+# such as "(cn=John*Doe)", or the surname (sn) attribute,
+# such as "(sn=Doe)" ...
+#$searchFilter       = "(uid=$uid)";
+$searchFilter = "(sn=$name)";
+
+print "Searching for name ", $name;
+
+# The attributes we'd like to have returned for each entry
+#
+# (Doing this is entirely optional; it simply reduces the
+# volume of data returned by excluding attributes that we're
+# not interested in receiving.)
+$attributesToReturn = [
+                       'dn',
+                        'uid',
+                        'displayName',
+                       'mail',
+                       'telephoneNumber',
+                       'ucbadrdept1',
+                       'ucbadrdept1name'
+                      ];
+
+# Connect to the directory
+# ------------------------
+print "Connecting to LDAP server \"$directoryURL\" ...\n";
+
+# Open a connection to the directory
+#$ldaps = Net::LDAPS->new($directoryURL,
+#                         verify => 'require',
+#                         capath => '/home/jgm/authtest/caldir-pem',
+#                        ) # as struct
+#   or die "$@";
+
+#print "Connected";
+
+# for ruby version see ruby-ldap.sourceforge.net/rdoc/ under ldap:sslconn
+
+$ldaps = Net::LDAPS->new($directoryURL) # as struct
+   or die "$@";
+    
+# Make an anonyous bind to the directory
+# (See the comments above if you wish to bind to the
+# directory as a specific user.)
+
+$ldaps->bind;
+
+#$ldaps->bind("$LDAPBIND",           
+#            password => "$LDAPPWD");
+
+#print "Looking up directory data for uid \"$uid\" ...\n";
+
+# Perform a search
+# ----------------
+$searchResultsObject = $ldaps->search
+          (
+         # Search the 'people' portion of the directory,
+         # as defined above
+            base   => $searchBase,   # Note the comma here
+           
+            # Search on the uid attribute
+            filter => $searchFilter, # and here
+           
+            # Return only a limited set of attributes from
+            # the search, *if* we've defined such a set above
+            attrs  => $attributesToReturn
+         );
+
+# If there is a result code (indicating an error),
+# display an error message
+if ($searchResultsObject->code) {
+  print "An error occurred during the LDAP search attempt:\n";
+  die $searchResultsObject->error;
+}
+
+# Disconnect from the directory
+# -----------------------------
+$ldaps->unbind;
+
+# Work with the data returned from the search
+# -------------------------------------------
+my $countOfEntriesReturned = $searchResultsObject->count;
+
+print "Search returned $countOfEntriesReturned entries ...\n\n";
+
+# Cycle through each of the directory entries returned from the
+# search, and extract and print the values of selected attributes
+# of each entry
+for ( my $index = 0 ; $index < $countOfEntriesReturned; $index++)
+  {
+  # Look at each of the 'entry' objects returned from the search
+    my $entry = $searchResultsObject->entry($index);
+
+    # Initialize each variable each time through the loop
+    $displayName  = "";
+    $uid = 0;
+    $eMailAddress = "";
+    $phoneNumber  = "";
+    $dept1Name    = "";
+    $dept1        = "";
+
+    # Extract the values from selected attributes
+    $dn  = $entry->get_value('dn');
+    $uid  = $entry->get_value('uid');
+    $displayName  = $entry->get_value('displayName');
+    $eMailAddress = $entry->get_value('mail');
+    $phoneNumber  = $entry->get_value('telephoneNumber'); 
+     
+    $dept1Name    = $entry->get_value('ucbadrdept1name');
+    $dept1        = $entry->get_value('ucbadrdept1');
+    if ($dept1Name)
+      { $departmentName = $dept1Name; }
+    else
+      { $departmentName = $dept1; }
+
+    print "  Distinguished Name: $dn\n";
+    print "  UID: $uid\n";
+    print "  Name: $displayName\n";
+    print "  Dept: $departmentName\n";
+    print "E-mail: $eMailAddress\n";
+    print " Phone: $phoneNumber\n";
+    print "\n";
+  }
+
+
+
