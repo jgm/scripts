@@ -1,0 +1,17 @@
+#!/bin/sh
+#script to establish ssh tunnel connection to protagoras 
+
+if [ $# -eq 0 ]; then
+  echo "Usage: tunnel username@machine.dest"
+  exit 1
+fi
+
+DEST=$1
+
+echo "Port on $DEST to connect to: "
+read destport
+echo "Port on localhost to tunnel through: "
+read localport 
+echo "Establishing tunnel from local port $localport to port $destport on $DEST."
+ssh -N -L $localport:localhost:$destport $DEST
+
