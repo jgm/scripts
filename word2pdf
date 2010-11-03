@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# Modified slightly from
+# http://www.togaware.com/linux/survivor/Convert_MS_Word.html
+
+# This script uses openoffice to convert word documents to PDF
+# It assumes that you've added some macros to your openoffice instance.
+# to do this, start up oowriter, go Tools => Macros => Organize Macros =>
+# OpenOffice.org Basic.  Then go to My Macros -> Standard -> Module1, and
+# edit to include this code:
+#
+# REM  *****  BASIC  *****
+# 
+# Sub ConvertWordToPDF(cFile)
+#    cURL = ConvertToURL(cFile)
+#    
+#    ' Open the document.
+#    ' Just blindly assume that the document is of a type that OOo will
+#    '  correctly recognize and open -- without specifying an import filter.
+#    oDoc = StarDesktop.loadComponentFromURL(cURL, "_blank", 0, Array(MakePropertyValue("Hidden", True), ))
+# 
+#    Dim comps
+#    comps = split (cFile, ".")
+#    If UBound(comps) > 0 Then
+#        comps(UBound(comps)) = "pdf"
+#        cfile = join (comps, ".")
+#    Else
+#        cfile = cFile + ".pdf"
+#    Endif
+# 
+#    cURL = ConvertToURL(cFile)
+#    
+#    ' Save the document using a filter.
+#    oDoc.storeToURL(cURL, Array(MakePropertyValue("FilterName", "writer_pdf_Export"), ))
+#    
+#    oDoc.close(True)
+#    
+# End Sub
+# 
+# Function MakePropertyValue( Optional cName As String, Optional uValue ) As com.sun.star.beans.PropertyValue
+#    Dim oPropertyValue As New com.sun.star.beans.PropertyValue
+#    If Not IsMissing( cName ) Then
+#       oPropertyValue.Name = cName
+#    EndIf
+#    If Not IsMissing( uValue ) Then
+#       oPropertyValue.Value = uValue
+#    EndIf
+#    MakePropertyValue() = oPropertyValue
+# End Function
+
+if [ $# -eq 0 ]; then
+  echo "Usage:  word2pdf [word file]..."
+  exit 1
+fi
+
+DIR=$(pwd)
+
+DOC=$DIR/$1
+for doc in "$@"; do
+  /usr/lib/openoffice/program/soffice.bin -writer -invisible "macro:///Standard.Module1.ConvertWordToPDF($DIR/$doc)" && echo "Created $DIR/${doc%.*}.pdf"
+done
