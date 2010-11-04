@@ -12,6 +12,9 @@ find_duplicate_words
 googlecode_upload.py
   upload to googlecode downloads
 
+letter
+  wrapper around pandoc and latex to produce PDF letter from markdown
+
 note
   add a note to a list of unstructured notes
 

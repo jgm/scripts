@@ -1,0 +1,133 @@
+#!/usr/bin/env ruby
+# converts markdown letter to PDF
+
+require 'optparse'
+require 'ostruct'
+require 'erb'
+require 'rubygems'
+#require 'peg_markdown'
+require 'pandoc-ruby'
+require 'rtex'
+
+# Set defaults
+@options = OpenStruct.new
+@options.fontsize = '11pt'
+@options.margin = '1.3in'
+@options.signature = ENV['HOME'] + '/Private/sig.pdf' 
+@options.sign = true 
+@options.template = nil
+@options.latex = false
+
+
+opts = OptionParser.new
+
+opts.on('-h', '--help')       { puts opts }
+opts.on('-f', '--fontsize FONTSIZE')   { |s| @options.fontsize = s }
+opts.on('-m', '--margin MARGIN')     { |m| @options.margin = m }
+opts.on('-s', '--signature SIGFILE')  { |s| @options.signature = s; @options.sign = true }
+opts.on('-n', '--no-sign')      { @options.sign = false }
+opts.on('-l', '--latex')        { @options.latex = true }
+
+opts.parse!(ARGV)
+
+infile = ARGV[0]
+if (not infile) || infile.empty?
+  puts "You must specify a file to convert."
+  exit 1
+end
+basename = File.basename(infile,File.extname(infile))
+
+salutations = /^(Dear .*[:,]|To whom it may concern:|Recommendation for (.*):|Letter of recommendation for (.*):)\s*$/
+
+closings = /^((Sincerely|Yours|Best|Sincerely yours),)/
+
+rawbody = File.open(infile).read
+salmatch = rawbody.match(salutations)
+
+salutation, saloffset, sallength =
+  if salmatch
+     [PandocRuby.new(salmatch[0]).to_latex(:smart), salmatch.begin(0), salmatch[0].length]
+  else
+     ["",0,0]
+  end
+
+address = if saloffset > 0
+            PandocRuby.new(rawbody.slice!(0..(saloffset-1)).split("\n").join("  \n").strip).to_latex(:smart)
+          else
+            ""
+          end
+rawbody.slice!(0..(sallength-1))
+
+closingmatch = rawbody.match(closings)
+closing, closingoffset =
+  if closingmatch
+    [PandocRuby.new(closingmatch[0]).to_latex(:smart), closingmatch.begin(0)]
+  else
+    ["",0]
+  end
+
+endstuff = rawbody.slice!(closingoffset, rawbody.length - 1)
+
+sign = @options.sign
+sigfile = @options.signature
+
+latexbody = PandocRuby.new(rawbody).to_latex(:smart)
+
+defaulttemplate=<<EOF
+\\documentclass[<%= @options.fontsize %>,letterpaper,oneside]{phil-letter}
+\\usepackage[pdftex]{graphicx}
+\\usepackage{pxfonts}
+\\usepackage[mathletters]{ucs}
+\\usepackage[utf8x]{inputenc}
+\\usepackage[margin=<%= @options.margin %>]{geometry}
+\\usepackage{enumerate}
+\\usepackage{hyperref}
+\\email{jgm@berkeley.edu\\vspace{5pt}}
+\\sigspace=5pt
+\\name{John MacFarlane\\\\
+Professor of Philosophy}
+\\setlength{\\parindent}{0pt}
+\\setlength{\\parskip}{6pt plus 2pt minus 1pt}
+\\begin{document}
+\\begin{letter}{<%= address %>}
+\\opening{<%= salutation %>}
+<%= latexbody %>
+\\closing{<%= closing %>
+<% if sign %>\\\\ \\vspace{10pt}{\\scalebox{.55}{\\includegraphics{<%= sigfile %>}}}<% end %>
+}
+%\\encl{}
+\\end{letter}
+\\end{document}
+EOF
+
+template = if @options.template
+              ERB.new(File.open(@options.template).read)
+           else
+              ERB.new(defaulttemplate)
+           end
+
+latexall = template.result
+
+if @options.latex
+  puts latexall
+  exit 0
+end
+
+output = RTeX::Document.new(latexall).to_pdf
+
+output = IO.popen("rubber-pipe --pdf --module graphicx", "w+") do |pipe|
+  pipe.puts latexall
+  pipe.close_write
+  pipe.read
+end
+
+
+if $? == 0 
+  File.open(basename + '.pdf', 'wb').write(output)
+  puts "Created #{basename}.pdf"
+  exit 0
+else
+  exit 1
+end
+
+
