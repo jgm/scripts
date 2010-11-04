@@ -1,0 +1,5 @@
+#!/bin/sh
+export AWS_ACCESS_KEY_ID=`cat ~/Private/aws-access-key-id`
+export AWS_SECRET_ACCESS_KEY=`cat ~/Private/aws-secret-access-key`
+export CLOUDLIB_LIBRARY_NAME=john-macfarlane-library
+/var/lib/gems/1.8/bin/cloudlib dump $HOME/cloudlib-backup
