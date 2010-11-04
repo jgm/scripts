@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # converts markdown letter to PDF
+# TODO - rewrite as wrapper around markdown2pdf w/ custom template
 
 require 'optparse'
 require 'ostruct'
