@@ -15,6 +15,9 @@ googlecode_upload.py
 note
   add a note to a list of unstructured notes
 
+s3sh
+  a wrapper around the s3sh gem
+
 texdiff.pl
   diff for TeX files
 

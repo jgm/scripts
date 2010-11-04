@@ -1,0 +1,4 @@
+#!/bin/sh
+AMAZON_ACCESS_KEY_ID=$(cat $HOME/Private/aws-access-key-id) \
+AMAZON_SECRET_ACCESS_KEY=$(cat $HOME/Private/aws-secret-access-key) \
+/var/lib/gems/1.8/bin/s3sh
