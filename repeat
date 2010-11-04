@@ -1,0 +1,5 @@
+#!/bin/sh
+# repeat n "command here"
+# repeats the command n times
+for i in $(seq 1 $1); do $2; done
+

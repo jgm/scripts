@@ -15,6 +15,9 @@ googlecode_upload.py
 note
   add a note to a list of unstructured notes
 
+repeat
+  repeats a command a given number of times
+
 s3sh
   a wrapper around the s3sh gem
 
