@@ -33,6 +33,9 @@ repeat
 s3sh
   a wrapper around the s3sh gem
 
+skype.py
+  interact with skype from command line
+
 texdiff.pl
   diff for TeX files
 
