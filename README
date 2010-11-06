@@ -15,6 +15,9 @@ backup-cloudlib
 calnet
   lookup names in Calnet LDAP directory
 
+daily-mail
+  sends a daily email with todos and notes
+
 find_duplicate_words
   find duplicate words in a text
 

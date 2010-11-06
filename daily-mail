@@ -1,0 +1,29 @@
+#!/bin/sh -e
+# mails todo list and unfiled notes to me, unless empty
+
+tempfile=`mktemp /tmp/mailXXXXXXXX`
+todofile="$HOME/Wiki/TodoList"
+notesfile="$HOME/Wiki/UnfiledNotes"
+
+addline ()  { echo $1 >> $tempfile ; }
+addfile ()  { cat  $1 >> $tempfile ; }
+
+addline "To: John MacFarlane <jgm@berkeley.edu>"
+addline "Subject: Todo list" 
+addline ""
+addline "Good morning John!" 
+addline ""
+
+if [ -s $notesfile ] ; then
+  addline "You have unfiled notes:"
+  addline ""
+  addfile $notesfile
+  addline ""
+fi
+addline "Here are some things to work on today:"
+addline ""
+addfile $todofile
+
+cat $tempfile | /usr/sbin/sendmail -F "Your Computer" -f "jgm" -i jgm@berkeley.edu
+rm $tempfile
+
