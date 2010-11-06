@@ -1,0 +1,11 @@
+#!/bin/sh
+# Convert a text file with abc music notation (abcnotation.com)
+# to MP3, suing abc2ps and lame.
+PID=$$
+TITLE=$(abc2ps -L "$1" | sed -n '2s/\s*\S*\s*\S*\s*\S*\s*\(.*\)/\1/p')
+WAV=Abc.wav
+MP3="${1%.abc}.mp3"
+abc2ps -a -Q ${BPM:=120} -W -A "$@"
+lame --tt "${TITLE}" $WAV $MP3
+echo "Created $MP3 for $TITLE"
+rm $WAV

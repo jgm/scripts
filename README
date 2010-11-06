@@ -1,5 +1,11 @@
 A collection of small scripts that serve various purposes.
 
+abc2mp3
+  convert abc musical notation to mp3 (wraps abc2ps, lame)
+
+abc2pdf
+  convert abc musical notation to PDF (wraps abc2ps)
+
 backup
   remote backup script, wrapping duplicity
 
