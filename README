@@ -18,6 +18,9 @@ calnet
 daily-mail
   sends a daily email with todos and notes
 
+doc2pdf
+  converts Word to PDF using OpenOffice
+
 find_duplicate_words
   find duplicate words in a text
 

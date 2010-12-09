@@ -1,0 +1,8 @@
+#!/bin/sh
+# Uses OpenOffice to convert a Word doc to PDF
+
+DIR=`pwd`
+DOC="$DIR/$1"
+
+/usr/bin/oowriter -invisible "macro:///Standard.Module1.ConvertWordToPDF($DOC)"
+
