@@ -1,0 +1,3 @@
+#!/bin/sh
+# print on Ricoh printer
+lpr -PRicohCopier -o sides=two-sided-long-edge "$@"
