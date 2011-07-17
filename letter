@@ -75,7 +75,7 @@ sigfile = @options.signature
 latexbody = PandocRuby.new(rawbody).to_latex(:smart)
 
 defaulttemplate=<<EOF
-\\documentclass[<%= @options.fontsize %>,letterpaper,oneside]{myletter}
+\\documentclass[<%= @options.fontsize %>,letterpaper,oneside]{ucbletter}
 \\usepackage[pdftex]{graphicx}
 \\usepackage{pxfonts}
 \\usepackage[mathletters]{ucs}
@@ -85,8 +85,12 @@ defaulttemplate=<<EOF
 \\usepackage{hyperref}
 \\email{jgm@berkeley.edu\\vspace{5pt}}
 \\sigspace=5pt
-\\name{John MacFarlane\\\\
-Professor of Philosophy}
+\\name{John MacFarlane}       % this only affects memos
+\\location{John MacFarlane}   % name under DEPARTMENT OF PHILOSOPHY
+\\email{jgm@berkeley.edu}  % email address under phone
+\\signature{John MacFarlane\\\\Professor of Philosophy}     % after the closing
+\\department{DEPARTMENT OF PHILOSOPHY}
+\\telephone{TEL: (510) 642-2722\\\\FAX: (510) 642-4164}
 \\setlength{\\parindent}{0pt}
 \\setlength{\\parskip}{6pt plus 2pt minus 1pt}
 \\begin{document}
