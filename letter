@@ -97,9 +97,7 @@ defaulttemplate=<<EOF
 \\begin{letter}{<%= address %>}
 \\opening{<%= salutation %>}
 <%= latexbody %>
-\\closing{<%= closing %>
-<% if sign %>\\\\ \\vspace{10pt}{\\scalebox{.55}{\\includegraphics{<%= sigfile %>}}}<% end %>
-}
+\\closing{<%= closing %><% if sign %>{\\vspace{20pt}\\\\\\scalebox{.55}{\\includegraphics{<%= sigfile %>}}}<% else %>\\vspace{30pt}<% end %>}
 %\\encl{}
 \\end{letter}
 \\end{document}
