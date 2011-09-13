@@ -118,13 +118,6 @@ end
 
 output = RTeX::Document.new(latexall).to_pdf
 
-output = IO.popen("rubber-pipe --pdf --module graphicx", "w+") do |pipe|
-  pipe.puts latexall
-  pipe.close_write
-  pipe.read
-end
-
-
 if $? == 0 
   File.open(basename + '.pdf', 'wb').write(output)
   puts "Created #{basename}.pdf"
