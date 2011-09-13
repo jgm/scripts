@@ -11,23 +11,23 @@ require 'pandoc-ruby'
 require 'rtex'
 
 # Set defaults
-@options = OpenStruct.new
-@options.fontsize = '11pt'
-@options.margin = '1.3in'
-@options.signature = ENV['HOME'] + '/Private/sig.pdf' 
-@options.sign = true 
-@options.template = nil
-@options.latex = false
+options = OpenStruct.new
+options.fontsize = '11pt'
+options.margin = '1.3in'
+options.signature = ENV['HOME'] + '/Private/sig.pdf' 
+options.sign = true 
+options.template = nil
+options.latex = false
 
 
 opts = OptionParser.new
 
 opts.on('-h', '--help')       { puts opts }
-opts.on('-f', '--fontsize FONTSIZE')   { |s| @options.fontsize = s }
-opts.on('-m', '--margin MARGIN')     { |m| @options.margin = m }
-opts.on('-s', '--signature SIGFILE')  { |s| @options.signature = s; @options.sign = true }
-opts.on('-n', '--no-sign')      { @options.sign = false }
-opts.on('-l', '--latex')        { @options.latex = true }
+opts.on('-f', '--fontsize FONTSIZE')   { |s| options.fontsize = s }
+opts.on('-m', '--margin MARGIN')     { |m| options.margin = m }
+opts.on('-s', '--signature SIGFILE')  { |s| options.signature = s; options.sign = true }
+opts.on('-n', '--no-sign')      { options.sign = false }
+opts.on('-l', '--latex')        { options.latex = true }
 
 opts.parse!(ARGV)
 
@@ -69,18 +69,18 @@ closing, closingoffset =
 
 endstuff = rawbody.slice!(closingoffset, rawbody.length - 1)
 
-sign = @options.sign
-sigfile = @options.signature
+sign = options.sign
+sigfile = options.signature
 
 latexbody = PandocRuby.new(rawbody).to_latex(:smart)
 
 defaulttemplate=<<EOF
-\\documentclass[<%= @options.fontsize %>,letterpaper,oneside]{ucbletter}
+\\documentclass[<%= options.fontsize %>,letterpaper,oneside]{ucbletter}
 \\usepackage[pdftex]{graphicx}
 \\usepackage{pxfonts}
 \\usepackage[mathletters]{ucs}
 \\usepackage[utf8x]{inputenc}
-\\usepackage[margin=<%= @options.margin %>]{geometry}
+\\usepackage[margin=<%= options.margin %>]{geometry}
 \\usepackage{enumerate}
 \\usepackage{hyperref}
 \\email{jgm@berkeley.edu\\vspace{5pt}}
@@ -103,15 +103,15 @@ defaulttemplate=<<EOF
 \\end{document}
 EOF
 
-template = if @options.template
-              ERB.new(File.open(@options.template).read)
+template = if options.template
+              ERB.new(File.open(options.template).read)
            else
               ERB.new(defaulttemplate)
            end
 
 latexall = template.result
 
-if @options.latex
+if options.latex
   puts latexall
   exit 0
 end
