@@ -54,10 +54,10 @@ salutation, saloffset, sallength =
 
 address = if saloffset > 0
             PandocRuby.new(rawbody.slice!(0..(saloffset-1)).split("\n").join("  \n").strip).to_latex(:smart)
+            rawbody.slice!(0..(sallength-1))
           else
             ""
           end
-rawbody.slice!(0..(sallength-1))
 
 closingmatch = rawbody.match(closings)
 closing, closingoffset =
