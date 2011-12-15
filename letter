@@ -67,7 +67,7 @@ closing, closingoffset =
   if closingmatch
     [PandocRuby.new(closingmatch[0]).to_latex(:smart), closingmatch.begin(0)]
   else
-    ["",0]
+    ["$\\quad$",rawbody.length - 1]
   end
 
 endstuff = rawbody.slice!(closingoffset, rawbody.length - 1)
