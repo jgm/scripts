@@ -1,5 +1,5 @@
 #!/bin/sh
 
-CLIENT=emacsclient --alternate-editor=""
+CLIENT="emacsclient --alternate-editor=''"
 
 (ls TODO.org && $CLIENT TODO.org) || $CLIENT '~/org/todo.org'
