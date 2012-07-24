@@ -1,5 +1,5 @@
 #!/bin/sh
 
-CLIENT=${EMACSCLIENT-"emacsclient --alternate-editor=''"}
+CLIENT=${EMACSCLIENT-"emacsclient"}
 
-(ls TODO.org && $CLIENT TODO.org) || $CLIENT '~/Dropbox/org/todo.org'
+(ls TODO.org && $CLIENT --alternate-editor='' TODO.org) || $CLIENT '~/Dropbox/org/todo.org'
