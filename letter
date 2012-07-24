@@ -77,7 +77,7 @@ sigfile = options.signature
 
 latexbody = PandocRuby.new(rawbody).to_latex(:smart)
 
-defaulttemplate=<<EOF
+defaulttemplate = <<EOF
 \\documentclass[<%= options.fontsize %>,letterpaper,oneside]{ucbletter}
 \\usepackage[pdftex]{graphicx}
 \\usepackage{pxfonts}
