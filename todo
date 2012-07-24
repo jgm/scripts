@@ -2,4 +2,4 @@
 
 CLIENT=${EMACSCLIENT-"emacsclient"}
 
-(ls TODO.org && $CLIENT --alternate-editor='' TODO.org) || $CLIENT '~/Dropbox/org/todo.org'
+(ls TODO.org 2>/dev/null && $CLIENT --alternate-editor='' TODO.org) || $CLIENT --alternate-editor='' '~/Dropbox/org/todo.org'
