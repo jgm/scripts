@@ -13,6 +13,8 @@ require 'rtex'
 # Set defaults
 options = OpenStruct.new
 options.fontsize = '11pt'
+options.font = 'lmodern'
+options.linespread = '1.1'
 options.margin = '1.3in'
 options.signature = ENV['HOME'] + '/Private/sig.pdf' 
 options.sign = true 
@@ -24,6 +26,8 @@ opts = OptionParser.new
 
 opts.on('-h', '--help')       { puts opts }
 opts.on('-f', '--fontsize FONTSIZE')   { |s| options.fontsize = s }
+opts.on('--font times|garamond|lmodern')   { |s| options.font = s }
+opts.on('--linespread NUMBER)') { |s| options.linespread = s }
 opts.on('-m', '--margin MARGIN')     { |m| options.margin = m }
 opts.on('-s', '--signature SIGFILE')  { |s| options.signature = s; options.sign = true }
 opts.on('-n', '--no-sign')      { options.sign = false }
@@ -79,8 +83,15 @@ latexbody = PandocRuby.new(rawbody).to_latex(:smart)
 
 defaulttemplate = <<EOF
 \\documentclass[<%= options.fontsize %>,letterpaper,oneside]{ucbletter}
+\\linespread{<%= options.linespread %>}
 \\usepackage[pdftex]{graphicx}
+<% if options.font == "garamond" %>
 \\usepackage[expert,urw-garamond]{mathdesign}
+<% elsif options.font == "times" %>
+\\usepackage{txfonts}
+<% elsif options.font == "lmodern" %>
+\\usepackage{lmodern}
+<% end %>
 \\usepackage[mathletters]{ucs}
 \\usepackage[utf8x]{inputenc}
 \\usepackage[margin=<%= options.margin %>]{geometry}
