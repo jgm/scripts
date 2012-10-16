@@ -132,11 +132,12 @@ end
 
 output = RTeX::Document.new(latexall).to_pdf
 
-if $? == 0 
+if $? == 0
   File.open(basename + '.pdf', 'wb').write(output)
   puts "Created #{basename}.pdf"
   exit 0
 else
+  puts "Error creating pdf!"
   exit 1
 end
 
