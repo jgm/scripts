@@ -12,12 +12,9 @@ FNAME="$2"
 NFNAME="/tmp/editlabels-`basename "$2"`.$$"
 
 function asklabel() {
-	read -e -p "Insert label: " $1
-	CVAL=${!1}
-	while ( ! grep -q "^$CVAL$" "$LFILE" ) || ( [ "$CVAL" == "" ] ) ; do
-		echo "Invalid label \"$CVAL\""
-		read -e -p "Insert label: " $1
-		CVAL=${!1}
+	LNAME=""
+        while [ "x$LNAME" == "x" ]; do
+	        LNAME=`rlwrap -S "Insert label: " -D2 -f $LFILE -H $LFILE -o cat`
 	done
 }
 
@@ -46,7 +43,7 @@ fi
 
 if [ "$ACTION" == "append" ]; then
 	ACT=`formail -c -X X-Label < "$FNAME"`
-	asklabel LNAME
+	asklabel
 	if [ "$ACT" == "" ]; then
 		NEW="X-Label: $LNAME"
 	else
@@ -57,7 +54,7 @@ if [ "$ACTION" == "append" ]; then
 
 elif [ "$ACTION" == "remove" ]; then
 	ACT=`formail -c -X X-Label < "$FNAME"`
-	asklabel LNAME
+	asklabel
 	NEW=`echo $ACT | sed "s/, $LNAME//g" | sed "s/$LNAME, //g" | sed "s/: $LNAME/:/g"`
 	formail -I "$NEW" < "$FNAME" > "$NFNAME"
 
@@ -79,4 +76,3 @@ fi
 if [ -f "$NFNAME" ]; then
 	mv "$NFNAME" "$FNAME"
 fi
-
