@@ -1,2 +1,2 @@
 #!/bin/sh
-pandoc --template memo -S -o "$1" "$@"
+pandoc --template memo -S -o "${1%.*}.pdf" "$@"

@@ -1,2 +1,2 @@
 #!/bin/sh
-pandoc --template letter -S -o "$1" "$@"
+echo pandoc --template letter -S -o "${1%.*}.pdf" "$@"
