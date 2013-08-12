@@ -1,0 +1,2 @@
+#!/bin/sh
+pandoc --template memo -S -o "$1" "$@"
