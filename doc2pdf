@@ -4,5 +4,5 @@
 DIR=`pwd`
 DOC="$DIR/$1"
 
-/usr/bin/oowriter -invisible "macro:///Standard.Module1.ConvertWordToPDF($DOC)"
+/usr/bin/libreoffice -invisible "macro:///Standard.Module1.ConvertWordToPDF($DOC)"
 
