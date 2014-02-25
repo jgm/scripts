@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Uploads files specified on the command line to zotero
+# Uploads contents of argv[1] to zotero, with name if specified
 # Assumes ZOTERO_KEY and ZOTERO_USER are set
 
 from pyzotero import zotero
@@ -9,8 +9,13 @@ import sys
 import os
 
 if len(sys.argv) < 2:
-  sys.stderr.write("No filenames specified\n")
-  sys.exit(1)
+  sys.stderr.write("Need filename as first argument")
+elif len(sys.argv) == 2:
+  filename = sys.argv[1]
+  bettername = filename
+else:
+  filename = sys.argv[1]
+  bettername = sys.argv[2]
 
 try:
   key = os.environ['ZOTERO_KEY']
@@ -29,6 +34,7 @@ zot = zotero.Zotero(user, 'user', key, True)
 # def prettyprint(x):
 #   print(json.dumps(x, sort_keys=False, indent=2, separators=(',', ': ')))
 
-zot.attachment_simple(sys.argv[1:])
+zot.attachment_both([(bettername, filename)])
+
 sys.exit(0)
 
