@@ -1,0 +1,3 @@
+#!/bin/sh
+pdfjam "$1" --trim '1cm 0.4cm 1cm 0.4cm' --clip true --outfile /dev/stdout | \
+  pdfnup --outfile "${1%.pdf}-2up.pdf"
