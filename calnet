@@ -100,7 +100,7 @@ $searchBase         = "ou=people,dc=berkeley,dc=edu";
 # such as "(cn=John*Doe)", or the surname (sn) attribute,
 # such as "(sn=Doe)" ...
 #$searchFilter       = "(uid=$uid)";
-$searchFilter = "(sn=$name)";
+$searchFilter = "(cn=$name)";
 
 print "Searching for name ", $name;
 
